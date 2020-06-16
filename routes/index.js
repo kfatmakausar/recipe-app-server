@@ -2,11 +2,13 @@ var express = require("express");
 var router = express.Router();
 
 // Subrouters;
-const playersRouter = require("./players");
+const recipesRouter = require("./recipes");
+const reviewsRouter = require("./reviews");
 
 // Mount our subrouters to assemble our apiRouter;
 
-router.use("/players", playersRouter);
+router.use("/recipes", recipesRouter);
+router.use("/reviews", reviewsRouter);
 
 // Error handling middleware;
 router.use((req, res, next) => {
