@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { Recipe, Review } = require("../database/models");
+const { Recipe, Review, User } = require("../database/models");
 
 
 //Route to get All Reviews//
@@ -35,7 +35,7 @@ router.post("/", async (req, res,next) =>{
 
   //Create a new review entity//
   const reviewObj = {
-    userName: userName,
+    userName: userName, //sequelize magic methods 
     imageUrl: imageUrl,
     description: description,
   };

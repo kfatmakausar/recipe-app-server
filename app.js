@@ -13,16 +13,21 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const helmet = require("helmet");
 const compression = require("compression");
+const session = require("express-session");
+const passport = require("passport");
+const cors = require("cors");
+const authRouter = require("./auth");
+const apiRouter = require("./routes/index");
 
 // Utilities;
 const createLocalDatabase = require("./utils/createLocalDatabase");
 const seedDatabase = require("./utils/seedDatabase");
 
+//Sequelize
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
 // Our database instance;
 const db = require("./database");
-
-// Our apiRouter
-const apiRouter = require("./routes/index");
+const sessionStore = new SequelizeStore({ db });
 
 // A helper function to sync our database;
 const syncDatabase = () => {
@@ -46,6 +51,21 @@ const syncDatabase = () => {
 // Instantiate our express application;
 const app = express();
 
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await db.models.user.findByPk(id);
+    done(null, user);
+  }
+  catch (err) {
+    done(err);
+  }
+});
+
+// const syncDb = async () => {
+//   await db.sync({ force: true });
+// }
+
 // A helper function to create our app with configurations and middleware;
 const configureApp = () => {
   app.use(helmet());
@@ -57,6 +77,22 @@ const configureApp = () => {
 
   app.use(express.static(path.join(__dirname, "public")));
 
+  app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+
+
+  app.use(
+    session({
+      secret: "a super secretive secret key string to encrypt and sign the cookie",
+      store: sessionStore,
+      resave: false,
+      saveUninitialized: false
+    })
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  app.use("/auth", authRouter);
   // Mount our apiRouter
   app.use("/api", apiRouter);
 
@@ -79,10 +115,19 @@ const configureApp = () => {
   });
 };
 
+const startListening = () => {
+  const PORT = 5000;
+  app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}!!!`);
+  })
+}
+
 // Main function declaration;
 const bootApp = async () => {
+  await sessionStore.sync();
   await syncDatabase();
   await configureApp();
+  await startListening();
 };
 
 // Main function invocation;

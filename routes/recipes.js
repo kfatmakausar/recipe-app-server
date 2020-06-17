@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { Recipe, Review } = require("../database/models");
+const { Recipe, Review, User } = require("../database/models");
 
 /* GET all recipes. */
 // /api/recipes
