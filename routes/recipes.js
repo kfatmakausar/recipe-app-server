@@ -6,11 +6,12 @@ const { Recipe, Review, User } = require("../database/models");
 // /api/recipes
 router.get("/", async (req, res, next) => {
   // try to get recipes object from database
+  console.log("GETRECIPE", req.user);
   try {
     // recipes will be the result of the Recipe.findAll promise
     const recipes = await Recipe.findAll({ include: Review });
     // if recipes is valid, it will be sent as a json response
-    console.log(recipes);
+    //console.log(recipes);
     res.status(200).json(recipes);
   } catch (err) {
     // if there is an error, it'll passed via the next parameter to the error handler middleware
@@ -62,27 +63,50 @@ router.get("/:id/reviews", async (req, res, next) => {
   // send back an array of reviews
 });
 
-// Route to handle adding a recipe
-// /api/recipes/
+// // Route to handle adding a recipe
+// // /api/recipes/
+// router.post("/", async (req, res, next) => {
+//   // Take the form data from the request body
+//   const { title, readyInMinutes, servings, sourceUrl, image } = req.body;
+//   // Create a recipe object
+//   const recipeObj = {
+//     title: title,
+//     readyInMinutes: readyInMinutes,
+//     servings: servings,
+//     sourceURL: sourceURL,
+//     image: image,
+//   };
+//   try {
+//     // Create a new recipe on the database
+//     const newRecipe = await Recipe.create(recipeObj);
+//     // The database would return a recipe
+//     // send that recipe as a json to the client
+//     res.status(201).send(newRecipe);
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
 router.post("/", async (req, res, next) => {
-  // Take the form data from the request body
-  const { title, readyInMinutes, servings, sourceUrl, image } = req.body;
-  // Create a recipe object
-  const recipeObj = {
-    title: title,
-    readyInMinutes: readyInMinutes,
-    servings: servings,
-    sourceUrl: sourceUrl,
-    image: image,
-  };
   try {
-    // Create a new recipe on the database
-    const newRecipe = await Recipe.create(recipeObj);
-    // The database would return a recipe
-    // send that recipe as a json to the client
-    res.status(201).send(newRecipe);
-  } catch (err) {
-    next(err);
+    const recipe = await Recipe.findOrCreate({
+      where: {
+        title: req.body.title,
+        readyInMinutes: req.body.readyInMinutes,
+        servings: req.body.servings,
+        sourceURL: req.body.sourceURL,
+        image: req.body.image,
+      },
+    });
+    //console.log(currentUser);
+    // console.log(req.session);
+    // console.log(req.body);
+    const currentUser = await User.findByPk(req.user.id);
+    const addRecipeResponse = await currentUser.addRecipe(recipe[0]);
+    console.log(addRecipeResponse);
+    res.json(recipe[0]);
+  } catch (error) {
+    next(error);
   }
 });
 
