@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const { Bookmark, Review, User } = require("../database/models");
 
+// /api/bookmarks
 router.get("/", async (req, res, next) => {
   if (req.user) {
     try {
@@ -17,10 +18,14 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// /api/bookmarks
 router.post("/", async (req, res, next) => {
   if (req.user) {
     try {
-      const bookmarkObj = { recipeId: req.body.recipeId, userId: req.user.id };
+      const bookmarkObj = {
+        recipeId: req.body.recipeId,
+        userId: req.user.id,
+      };
       const newBookmark = await Bookmark.create(bookmarkObj);
       res.status(200).json(newBookmark);
     } catch (err) {
@@ -31,6 +36,8 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+//Router to get a single bookmark
+// /api/bookmarks/id
 router.get("/:id", async (req, res, next) => {
   try {
     const bookmark = await Bookmark.findByPk(req.params.id);
