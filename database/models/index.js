@@ -4,9 +4,7 @@ const Bookmark = require("./bookmark");
 const Review = require("./review");
 const User = require("./user");
 
-//The User has many Recipes saved
-//User writes many reviews
-//Review belongs to one and only one Recipe
+//The User bookmarks a recipe based on recipeId
 
 User.hasMany(Review); //User will have a reviews array
 Review.belongsTo(User); //Review will have a userId as foreign key
