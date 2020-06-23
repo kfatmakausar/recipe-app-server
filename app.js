@@ -56,8 +56,7 @@ passport.deserializeUser(async (id, done) => {
   try {
     const user = await db.models.user.findByPk(id);
     done(null, user);
-  }
-  catch (err) {
+  } catch (err) {
     done(err);
   }
 });
@@ -77,15 +76,15 @@ const configureApp = () => {
 
   app.use(express.static(path.join(__dirname, "public")));
 
-  app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
-
+  app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 
   app.use(
     session({
-      secret: "a super secretive secret key string to encrypt and sign the cookie",
+      secret:
+        "a super secretive secret key string to encrypt and sign the cookie",
       store: sessionStore,
       resave: false,
-      saveUninitialized: false
+      saveUninitialized: false,
     })
   );
 
@@ -115,19 +114,19 @@ const configureApp = () => {
   });
 };
 
-const startListening = () => {
-  const PORT = 5000;
-  app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}!!!`);
-  })
-}
+// const startListening = () => {
+//   const PORT = 5000;
+//   app.listen(PORT, () => {
+//     console.log(`Listening on port ${PORT}!!!`);
+//   })
+// }
 
 // Main function declaration;
 const bootApp = async () => {
   await sessionStore.sync();
   await syncDatabase();
   await configureApp();
-  await startListening();
+  // await startListening();
 };
 
 // Main function invocation;

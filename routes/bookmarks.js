@@ -18,8 +18,24 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+//Router to get a single bookmark
+// /api/bookmarks/id
+router.get("/:id", async (req, res, next) => {
+  if (req.user) {
+    try {
+      const bookmark = await Bookmark.findByPk(req.params.id);
+      res.status(200).json(bookmark);
+    } catch (err) {
+      next(err);
+    }
+  }
+});
+
 // /api/bookmarks
 router.post("/", async (req, res, next) => {
+  console.log(req);
+  console.log(req.body);
+  console.log(req.params);
   if (req.user) {
     try {
       const bookmarkObj = {
@@ -33,17 +49,6 @@ router.post("/", async (req, res, next) => {
     }
   } else {
     res.redirect("/");
-  }
-});
-
-//Router to get a single bookmark
-// /api/bookmarks/id
-router.get("/:id", async (req, res, next) => {
-  try {
-    const bookmark = await Bookmark.findByPk(req.params.id);
-    res.status(200).json(bookmark);
-  } catch (err) {
-    next(err);
   }
 });
 
